@@ -1,9 +1,11 @@
 package com.alpha.kasheets.view.bottomsheets.pizzasheet
 
+import android.content.res.Resources
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import com.alpha.kasheets.databinding.BottomSheetBinding
 import com.alpha.kasheets.model.Pizza
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -12,27 +14,21 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 class BottomSheetFragment : BottomSheetDialogFragment() {
 
     private lateinit var binding: BottomSheetBinding
+    private val height: Int by lazy { Resources.getSystem().displayMetrics.heightPixels }
 
     override fun onStart() {
         super.onStart()
         BottomSheetBehavior.from(requireView().parent as View).apply {
-            halfExpandedRatio = 0.50f
-            state = BottomSheetBehavior.STATE_HALF_EXPANDED
+            peekHeight = height / 2
+            if(state == BottomSheetBehavior.STATE_COLLAPSED)
+                binding.rvPizza.setPadding(0, 0 ,0 ,height / 4)
 
             addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
                 override fun onStateChanged(bottomSheet: View, newState: Int) {
-                    if (state == BottomSheetBehavior.STATE_EXPANDED)
-                        state = BottomSheetBehavior.STATE_HALF_EXPANDED
                 }
 
                 override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                    if (slideOffset > -0.60) {
-                        if (slideOffset > -0.20)
-                            halfExpandedRatio = 0.75f
-                        else if (slideOffset > -0.60)
-                            halfExpandedRatio = 0.50f
-                        state = BottomSheetBehavior.STATE_HALF_EXPANDED
-                    }
+                    binding.rvPizza.setPadding(0, 0 ,0 , ((height / 4.0) - (slideOffset * (height / 4.0))).toInt())
                 }
             })
         }
@@ -44,6 +40,9 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = BottomSheetBinding.inflate(inflater, container, false)
+        val layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (height * 0.75f).toInt())
+        binding.root.layoutParams = layoutParams
+
         val pizzaList = arrayListOf(
             Pizza(
                 "https://res.cloudinary.com/dk4ocuiwa/image/upload/v1575163942/RecipesApi/sweetpotatokalepizza2c6db.jpg",
@@ -108,7 +107,6 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
                 "Chow",
                 "Breakfast Pita-Pizza Recipe"
             ),
-
 
             Pizza(
                 "https://res.cloudinary.com/dk4ocuiwa/image/upload/v1575163942/RecipesApi/sweetpotatokalepizza2c6db.jpg",
